@@ -13,8 +13,6 @@ function setup() {
 	);
 
 	fill(0);
-	//stroke(120);
-	noStroke();
 	rectMode(CENTER);
 }
 
@@ -45,27 +43,28 @@ function drawQuadTree(tree) {
 
 		const R = noise(Date.now() / 1000, tree.boundary.center.x / width, tree.boundary.center.y / height);
 		const A = map(R, 0, 1, 0, pupilLoc.y + (tree.boundary.halfDimension));
-		//console.log(A);
-		// console.log([R,A,B,C,D]);
 		const GAP = 20;
 
 		//fill(200);
+		
+
+		// eyelids
+		//upper
+
 		fill(80, 40, 255);
 		stroke(255, 40, 80);
 		strokeWeight(0.5);
-		// eyelids
-		//upper
 
 		const LIDY = tree.boundary.center.y - tree.boundary.halfDimension;
 
 		quad(
 			tree.boundary.center.x - tree.boundary.halfDimension, LIDY,
 			tree.boundary.center.x + tree.boundary.halfDimension, LIDY,
-			tree.boundary.center.x + tree.boundary.halfDimension, LIDY + A,
-			tree.boundary.center.x - tree.boundary.halfDimension, LIDY + A
+			tree.boundary.center.x + tree.boundary.halfDimension, LIDY + A - pupilLoc.x / 2,
+			tree.boundary.center.x - tree.boundary.halfDimension, LIDY + A + pupilLoc.x / 2
 		);
+		
 		//lower
-
 		const B = map(A, tree.boundary.halfDimension / 2, tree.boundary.halfDimension / 2 * 3, tree.boundary.halfDimension / 3, tree.boundary.halfDimension / 7);
 		quad(
 			tree.boundary.center.x - tree.boundary.halfDimension, tree.boundary.center.y + tree.boundary.halfDimension,
@@ -83,7 +82,6 @@ function draw() {
 }
 
 function mouseClicked() {
-	console.log(biggestTree);
 	biggestTree.insert(new XY(mouseX, mouseY));
 	return false;
 }
@@ -137,21 +135,18 @@ QuadTree.prototype.insert = function(p) {
 	if (this.points.length < this.QT_NODE_CAPACITY && this.nw == null)
 	{
 		this.points.push(p);
+		this.subdivide();
 		return true;
 	}
 
-	// Otherwise, subdivide and then add the point to whichever node will accept it
-	if (this.nw == null)
-		this.subdivide();
+	// // Otherwise, subdivide and then add the point to whichever node will accept it
+	// if (this.nw == null)
+	// 	this.subdivide();
 
 	if (this.nw.insert(p)) return true;
-	else console.log("nw does not contain")
 	if (this.ne.insert(p)) return true;
-	else console.log("ne does not contain")
 	if (this.sw.insert(p)) return true;
-	else console.log("sw does not contain")
 	if (this.se.insert(p)) return true;
-	else console.log("se does not contain")
 	// Otherwise, the point cannot be inserted for some unknown reason (this should never happen)
 	return false;
 }
